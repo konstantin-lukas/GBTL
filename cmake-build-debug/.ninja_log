@@ -1,0 +1,13 @@
+# ninja log v5
+0	66	6813398813437302	CMakeFiles/GBSTL.dir/source/linked_list.cpp.obj	dde5acf59224799a
+1	62	6813400210686337	CMakeFiles/linked_list.dir/source/linked_list.cpp.obj	bd8fe1258a277568
+3	530	6813400897344099	CMakeFiles/test.dir/test/main.cpp.obj	6c55043bc1c9b1e6
+6	484	6813383769086432	CMakeFiles/GBSTL.dir/test/main.cpp.obj	80a4dc9218584ef7
+1	169	6813407081534242	build.ninja	8ca1c1f6dc2356a0
+1	486	6813399029722169	CMakeFiles/GBSTL_test.dir/test/main.cpp.obj	ef3b575f856e20a1
+77	188	6813402526339164	test.exe	17de77f0e77231a6
+3	69	6813401344826986	linked_list.a	171401e758bdbf8
+3	69	6813404382365893	../lib/linked_list.a	54f2a0b27037991c
+70	168	6813404383315989	../bin/test.exe	8ef687ecb9a4547f
+0	499	6813407159954737	CMakeFiles/test.dir/test/test.cpp.obj	40ba0998769ac3c5
+507	612	6813407161035996	../bin/test.exe	7ad09888085195d6
