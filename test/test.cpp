@@ -1,15 +1,16 @@
 #include <iostream>
 #include "linked_list.h"
+#include <memory>
 int main() {
-    gbstl::LinkedList<int> list;
-    list.push(6);
-    list.push(3);
-    list.push(81);
-    list.push(8511);
-    list.print();
-    list[1] = 52;
-    list.print();
-    list.getElementAt(3) = 1;
-    list.print();
-    std::cout << list[1] << std::endl;
+    gbstl::LinkedList<int> list1;
+    list1.append(1);
+    list1.append(2);
+    list1.append(3);
+    gbstl::LinkedList<int> list2 = std::move(list1);
+    list2.append(4);
+    list2.append(5);
+    std::cout << "Length: " << list2.length() << ", Size: " << sizeof list2 << std::endl;
+    for (int value : list2) {
+        printf("---%d\n", value);
+    }
 }

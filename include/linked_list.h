@@ -3,70 +3,121 @@
 
 #include <cstddef>
 #include <iostream>
+#include <memory>
 
 namespace gbstl {
 
     template<typename type> class LinkedList {
         struct Link {
             type value;
-            Link* nextLink;
+            std::shared_ptr<Link>nextLink;
             explicit Link(type val) : value(val), nextLink(nullptr){}
+            explicit Link(type val, std::shared_ptr<Link> next) : value(val), nextLink(next){}
         };
     private:
-        Link* m_FirstLink;
-        Link* m_currentLink;
-        size_t m_Size;
+        std::shared_ptr<Link>mp_FirstLink;
+        std::shared_ptr<Link>mp_currentLink;
+        size_t m_Length;
     public:
-        LinkedList() : m_FirstLink(nullptr), m_currentLink(nullptr), m_Size(0) {}
-        type& getElementAt(unsigned int index) {
-            m_currentLink = m_FirstLink;
-            if (m_currentLink == nullptr) throw std::out_of_range("linked list is empty");
-            if (index >= m_Size) throw std::out_of_range(std::string("index ") + std::to_string(index) + std::string(" is out of range"));
-            for (int i = 0; i < index; i++) {
-                m_currentLink = m_currentLink->nextLink;
+        // CONSTRUCTOR
+        LinkedList() : mp_FirstLink(nullptr), mp_currentLink(nullptr), m_Length(0) {}
+
+        // COPY CONSTRUCTOR
+        LinkedList(const LinkedList<type> &src) {
+            m_Length = src.m_Length;
+            mp_FirstLink = std::shared_ptr<Link>(new Link(src.mp_FirstLink->value, src.mp_FirstLink->nextLink));
+            mp_currentLink = mp_FirstLink;
+            while (mp_currentLink->nextLink != nullptr) {
+                mp_currentLink->nextLink = std::shared_ptr<Link>(new Link(mp_currentLink->nextLink->value, mp_currentLink->nextLink->nextLink));
+                if (mp_currentLink->nextLink != nullptr) mp_currentLink = mp_currentLink->nextLink;
             }
-            return m_currentLink->value;
+        }
+
+        // MOVE CONSTRUCTOR
+        LinkedList(const LinkedList<type> &&src) noexcept {
+            mp_FirstLink = src.mp_FirstLink;
+            mp_currentLink = mp_FirstLink;
+            m_Length = src.m_Length;
+        }
+        type& getLinkRefAt(unsigned int index) {
+            mp_currentLink = mp_FirstLink;
+            if (mp_currentLink == nullptr) throw std::out_of_range("linked list is empty");
+            if (index >= m_Length) throw std::out_of_range(std::string("index ") + std::to_string(index) + std::string(" is out of range"));
+            for (int i = 0; i < index; i++) {
+                mp_currentLink = mp_currentLink->nextLink;
+            }
+            return mp_currentLink->value;
+        }
+        type getLinkAt(unsigned int index) {
+            return getLinkRefAt(index);
         }
         type& operator[](unsigned int index) {
-            return getElementAt(index);
+            return getLinkRefAt(index);
         }
-        const type& operator[](unsigned int index) const {
-            return getElementAt(index);
+        type operator[](unsigned int index) const {
+            return getLinkAt(index);
         }
-        ~LinkedList() {
-            Link* garbage = m_FirstLink;
-            while (garbage != nullptr) {
-                Link* nextLink = garbage->nextLink;
-                delete garbage;
-                garbage = nextLink;
-            }
-        }
-        void push(type value) {
-            if (m_FirstLink == nullptr) {
-                m_FirstLink = new Link(value);
+        void append(type value) {
+            if (mp_FirstLink == nullptr) {
+                mp_FirstLink = std::shared_ptr<Link>(new Link(value));
             } else {
-                m_currentLink = m_FirstLink;
-                while (m_currentLink->nextLink != nullptr)
-                    m_currentLink = m_currentLink->nextLink;
-                m_currentLink->nextLink = new Link(value);
+                mp_currentLink = mp_FirstLink;
+                while (mp_currentLink->nextLink != nullptr)
+                    mp_currentLink = mp_currentLink->nextLink;
+                mp_currentLink->nextLink = std::shared_ptr<Link>(new Link(value));
             }
-            this->m_Size++;
+            this->m_Length++;
         }
+        // TODO: ITERATOR
+
         // TODO: REMOVE ELEMENT AT
-        // TODO: POP
-        // TODO: COPY CONSTRUCTOR
         // TODO: EMPTY
         // TODO: CONSTRUCTOR FROM ARRAY
-        void print() {
-            m_currentLink = m_FirstLink;
-            while (m_currentLink != nullptr) {
-                std::cout << m_currentLink->value;
-                if (m_currentLink->nextLink != nullptr) std::cout << ", ";
-                m_currentLink = m_currentLink->nextLink;
+        // TODO: DOUBLY LINKED LIST
+        // TODO: GET INDEX OF
+        // TODO: COUNT
+        // TODO INSERT
+        // TODO: APPENDARRAY
+        // TODO: INSERTARRAY
+        // TODO: APPEND
+        // TODO: SORT
+        // TODO: OPTIMIZE RUN TIME BY CHECKING IF CURRENT LINK IS USABLE FOR FUNCTION
+        // TODO: INITIALIZER LIST
+
+        size_t length() { return m_Length; }
+
+        class Iterator {
+        public:
+            explicit Iterator(std::shared_ptr<Link> ptr) : mp_Ptr(ptr) {}
+            Iterator& operator++() {
+                mp_Ptr = mp_Ptr->nextLink;
+                return *this;
             }
-            std::cout << std::endl;
+            const Iterator operator++(int) {
+                Iterator it = *this;
+                ++(*this);
+                return it;
+            }
+            type operator*() {
+                return this->mp_Ptr->value;
+            }
+            bool operator!=(const Iterator& it) const {
+                return mp_Ptr != it.mp_Ptr;
+            }
+            bool operator==(const Iterator& it) const {
+                return mp_Ptr == it.mp_Ptr;
+            }
+        private:
+            std::shared_ptr<Link> mp_Ptr;
+        };
+
+        Iterator begin() {
+            return Iterator(mp_FirstLink);
         }
-        size_t length() { return m_Size; }
+
+        Iterator end() {
+            return Iterator(nullptr);
+        }
     };
 
 }
