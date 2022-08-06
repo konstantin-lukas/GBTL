@@ -13,106 +13,113 @@ namespace gbstl {
             Link *nextLink;
             explicit Link(type val) : value(val), nextLink(nullptr){}
             explicit Link(type val, Link *next) : value(val), nextLink(next){}
+            ~Link() { printf("gaw");}
         };
     private:
-        Link *mp_Head;
-        Link *mp_InternalPtr;
+        Link *mp_Head = nullptr;
+        Link *mp_Tail = nullptr;
         size_t m_Length = 0;
     public:
         // CONSTRUCTOR
-        LinkedList() : mp_Head(nullptr), mp_InternalPtr(nullptr) {};
+        LinkedList() = default;
 
         // COPY CONSTRUCTOR
         LinkedList(const LinkedList &src) {
             m_Length = src.m_Length;
             mp_Head = new Link(src.mp_Head->value, src.mp_Head->nextLink);
-            mp_InternalPtr = mp_Head;
-            while (mp_InternalPtr->nextLink != nullptr) {
-                mp_InternalPtr->nextLink = new Link(mp_InternalPtr->nextLink->value, mp_InternalPtr->nextLink->nextLink);
-                if (mp_InternalPtr->nextLink != nullptr) mp_InternalPtr = mp_InternalPtr->nextLink;
+            Link *tmpPtr = mp_Head;
+            while (tmpPtr->nextLink != nullptr) {
+                tmpPtr->nextLink = new Link(tmpPtr->nextLink->value, tmpPtr->nextLink->nextLink);
+                if (tmpPtr->nextLink != nullptr) tmpPtr = tmpPtr->nextLink;
             }
+            mp_Tail = tmpPtr;
         }
 
         // MOVE CONSTRUCTOR
         LinkedList(LinkedList &&src) noexcept {
             mp_Head = src.mp_Head;
-            mp_InternalPtr = mp_Head;
+            mp_Tail = src.mp_Tail;
             m_Length = src.m_Length;
             src.mp_Head = nullptr;
-            src.mp_InternalPtr = nullptr;
+            src.mp_Tail = nullptr;
             src.m_Length = 0;
         }
 
         LinkedList& operator=(LinkedList &&src) noexcept {
             if (this != &src) {
                 mp_Head = src.mp_Head;
-                mp_InternalPtr = mp_Head;
+                mp_Tail = src.mp_Tail;
                 m_Length = src.m_Length;
                 src.mp_Head = nullptr;
-                src.mp_InternalPtr = nullptr;
+                src.mp_Head = nullptr;
                 src.m_Length = 0;
             }
             return *this;
         }
 
         // DESTRUCTOR
-        ~LinkedList() {
+        ~LinkedList() { flush(); }
+
+        void flush() {
             Link* garbage = mp_Head;
             while (garbage != nullptr) {
-                Link* nextLink = garbage->nextLink;
+                Link *nextLink = garbage->nextLink;
                 delete garbage;
                 garbage = nextLink;
             }
+            mp_Head = nullptr;
+            mp_Tail = nullptr;
+            m_Length = 0;
         }
-        type& getLinkAt(unsigned int index) {
-            mp_InternalPtr = mp_Head;
-            if (mp_InternalPtr == nullptr) throw std::out_of_range("linked list is empty");
-            if (index >= m_Length) throw std::out_of_range(std::string("index ") + std::to_string(index) + std::string(" is out of range"));
-            for (int i = 0; i < index; i++) {
-                mp_InternalPtr = mp_InternalPtr->nextLink;
-            }
-            return mp_InternalPtr->value;
+
+        void pushHead(const type& value) {
+            mp_Head = new Link(value, mp_Head);
         }
-        const type& getLinkAt(unsigned int index) const {
-            return getLinkAt(index);
-        }
-        type& operator[](unsigned int index) {
-            return getLinkAt(index);
-        }
-        const type& operator[](unsigned int index) const {
-            return getLinkAt(index);
-        }
-        void append(const type& value) {
-            if (mp_Head == nullptr) {
-                mp_Head = new Link(value);
-            } else {
-                mp_InternalPtr = mp_Head;
-                while (mp_InternalPtr->nextLink != nullptr)
-                    mp_InternalPtr = mp_InternalPtr->nextLink;
-                mp_InternalPtr->nextLink = new Link(value);
+
+        void pushTail(const type& value) {
+            if (mp_Head == nullptr)
+                mp_Head = mp_Tail = new Link(value);
+            else {
+                mp_Tail->nextLink = new Link(value);
+                mp_Tail = mp_Tail->nextLink;
             }
             this->m_Length++;
         }
-        // TODO: ITERATOR
 
-        // TODO: REMOVE ELEMENT AT
-        // TODO: EMPTY
+        void popHead() {
+            if (mp_Head == nullptr) return;
+            Link *tmpPtr = mp_Head->nextLink;
+            delete mp_Head;
+            mp_Head = tmpPtr;
+        }
+
+        void popTail() {
+            if (mp_Head == nullptr) return;
+            Link *tmpPtr = mp_Head;
+            while (tmpPtr->nextLink != mp_Tail) tmpPtr = tmpPtr->nextLink;
+            delete mp_Tail;
+            mp_Tail = tmpPtr;
+            mp_Tail->nextLink = nullptr;
+        }
+
+        // TODO PUSH_POS (OVERLOAD ARRAY)
+        // TODO POP_POS (OVERLOAD ARRAY)
         // TODO: CONSTRUCTOR FROM ARRAY
-        // TODO: DOUBLY LINKED LIST
-        // TODO: GET INDEX OF
-        // TODO: COUNT
-        // TODO: TAIL MEMBER
-        // TODO INSERT
-        // TODO: APPENDARRAY
-        // TODO: INSERTARRAY
-        // TODO: APPEND
+        // TODO: CONCAT
         // TODO: SORT
-        // TODO: OPTIMIZE RUN TIME BY CHECKING IF CURRENT LINK IS USABLE FOR FUNCTION
-        // TODO: INITIALIZER LIST
+        // TODO: MERGE
+        // TODO: DOCUMENTATION
 
         [[nodiscard]] size_t length() const { return m_Length; }
 
+        [[nodiscard]] bool isEmpty() const { return mp_Head == nullptr; }
+
+        [[nodiscard]] const type& head() const { return mp_Head->value; }
+
+        [[nodiscard]] const type& tail() const { return mp_Tail->value; }
+
         class Iterator {
+            // TODO: REVERSE ITERATOR
         public:
             explicit Iterator(Link *ptr) : mp_Ptr(ptr) {}
             Iterator& operator++() {
