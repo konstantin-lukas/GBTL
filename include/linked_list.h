@@ -83,68 +83,121 @@ namespace gbstl {
 
         void pushHead(const type& value) {
             mp_Head = new Link(value, mp_Head);
+            m_Length++;
+        }
+
+        void pushHead(const type values[], uint32_t begin, uint32_t end) {
+            if (end < begin) throw std::out_of_range("end cannot be smaller than begin");
+            Link *tmpPtr = mp_Head = new Link(values[begin], mp_Head);
+            for (uint32_t i = begin + 1; i <= end; ++i) {
+                tmpPtr = tmpPtr->nextLink = new Link(values[i], tmpPtr->nextLink);
+            }
+            if (m_Length == 0) mp_Tail = tmpPtr;
+            m_Length += end - begin + 1;
         }
 
         void pushTail(const type& value) {
-            if (mp_Head == nullptr)
+            if (m_Length == 0)
                 mp_Head = mp_Tail = new Link(value);
             else {
                 mp_Tail->nextLink = new Link(value);
                 mp_Tail = mp_Tail->nextLink;
             }
-            this->m_Length++;
-        }
-
-        void pushPos(const type& value, uint32_t pos) {
-            if (pos > m_Length) throw std::out_of_range("specified position is out of range");
-            if (pos == 0) {
-                mp_Head = new Link(value, mp_Head);
-            } else if (pos == m_Length - 1) {
-                mp_Tail->nextLink = new Link(value);
-                mp_Tail = mp_Tail->nextLink;
-            } else {
-                Link *tmpPtr = mp_Head;
-                for (uint32_t i = 1; i < pos; i++) tmpPtr = tmpPtr->nextLink;
-                tmpPtr->nextLink = new Link(value, tmpPtr->nextLink);
-            }
             m_Length++;
         }
 
+        void pushTail(const type values[], uint32_t begin, uint32_t end) {
+            if (end < begin) throw std::out_of_range("end cannot be smaller than begin");
+            if (m_Length == 0)
+                mp_Head = mp_Tail = new Link(values[begin]);
+            else {
+                mp_Tail = mp_Tail->nextLink = new Link(values[begin]);
+            }
+            for (uint32_t i = begin + 1; i <= end; ++i) {
+                mp_Tail = mp_Tail->nextLink = new Link(values[i]);
+            }
+            m_Length += end - begin + 1;
+        }
+
+        void pushPos(const type& value, uint32_t pos) {
+            if (pos > m_Length - 1) throw std::out_of_range("specified position is out of range");
+            if (m_Length == 0) {
+                mp_Head = mp_Tail = new Link(value);
+                m_Length = 1;
+            } else {
+                if (pos == 0) {
+                    mp_Head = new Link(value, mp_Head);
+                } else if (pos == m_Length - 1) {
+                    mp_Tail->nextLink = new Link(value);
+                    mp_Tail = mp_Tail->nextLink;
+                } else {
+                    Link *tmpPtr = mp_Head;
+                    for (uint32_t i = 1; i < pos; i++) tmpPtr = tmpPtr->nextLink;
+                    tmpPtr->nextLink = new Link(value, tmpPtr->nextLink);
+                }
+                m_Length++;
+            }
+        }
+
         void pushPos(const type values[], uint32_t pos, uint32_t begin, uint32_t end) {
-            if (pos > m_Length) throw std::out_of_range("specified position is out of range");
+            if (pos > m_Length - 1) throw std::out_of_range("specified position is out of range");
             if (end < begin) throw std::out_of_range("end cannot be smaller than begin");
             Link *tmpPtr;
-            if (pos == 0) {
-                tmpPtr = mp_Head = new Link(values[begin], mp_Head);
-            } else if (pos == m_Length - 1) {
-                tmpPtr = mp_Tail->nextLink = new Link(values[begin]);
+            if (m_Length == 0) {
+                tmpPtr = mp_Head = new Link(values[begin]);
+                mp_Tail = tmpPtr;
             } else {
-                tmpPtr = mp_Head;
-                for (u_int32_t i = 1; i < pos; i++) tmpPtr = tmpPtr->nextLink;
-                tmpPtr = tmpPtr->nextLink = new Link(values[begin], tmpPtr->nextLink);
+                if (pos == 0) {
+                    tmpPtr = mp_Head = new Link(values[begin], mp_Head);
+                } else {
+                    tmpPtr = mp_Head;
+                    for (uint32_t i = 1; i < pos; ++i) tmpPtr = tmpPtr->nextLink;
+                    tmpPtr = tmpPtr->nextLink = new Link(values[begin], tmpPtr->nextLink);
+                }
             }
-            for (uint32_t i = begin + 1; i <= end; i++) {
+            for (uint32_t i = begin + 1; i <= end; ++i) {
                 tmpPtr = tmpPtr->nextLink = new Link(values[i], tmpPtr->nextLink);
             }
-            if (pos == m_Length - 1) mp_Tail = tmpPtr->nextLink;
+            if (pos == m_Length - 1) mp_Tail = tmpPtr;
             m_Length += end - begin + 1;
         }
 
         void popHead() {
-            if (mp_Head == nullptr) return;
-            Link *tmpPtr = mp_Head->nextLink;
-            delete mp_Head;
-            mp_Head = tmpPtr;
+            if (m_Length == 0) return;
+            if (m_Length == 1) {
+                delete mp_Head;
+                mp_Head = mp_Tail = nullptr;
+                m_Length = 0;
+            } else {
+                Link *tmpPtr = mp_Head->nextLink;
+                delete mp_Head;
+                m_Length--;
+                mp_Head = tmpPtr;
+            }
         }
 
         void popTail() {
-            if (mp_Head == nullptr) return;
-            Link *tmpPtr = mp_Head;
-            while (tmpPtr->nextLink != mp_Tail) tmpPtr = tmpPtr->nextLink;
-            delete mp_Tail;
-            mp_Tail = tmpPtr;
-            mp_Tail->nextLink = nullptr;
+            if (m_Length == 0) return;
+            if (m_Length == 1) {
+                delete mp_Head;
+                mp_Head = mp_Tail = nullptr;
+                m_Length = 0;
+            } else {
+                Link *tmpPtr = mp_Head;
+                while (tmpPtr->nextLink != mp_Tail) tmpPtr = tmpPtr->nextLink;
+                delete mp_Tail;
+                mp_Tail = tmpPtr;
+                m_Length--;
+            }
         }
+
+        /*void popPos(const uint32_t pos) {
+            if (pos > m_Length) throw std::out_of_range("specified position is out of range");
+            if (m_Length == 0) return;
+            Link *tmpPtr = mp_Head;
+
+
+        }*/
 
         // TODO POP_POS (OVERLOAD ARRAY)
         // TODO: CONCAT

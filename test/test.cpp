@@ -2,12 +2,22 @@
 #include "linked_list.h"
 #include <memory>
 int main() {
-    int array[] = {1,5,2,25,2,6,1,2};
-    gbstl::LinkedList<int> list1(array,0,7);
-    std::cout << list1.length() << std::endl;
-    list1.pushPos(array, 6,0,7);
-    std::cout << list1.length() << std::endl;
-    for (int val : list1) {
+    gbstl::LinkedList<int> list1;
+    int array[] = {4,5,6};
+
+    list1.pushTail(array, 1, 2);
+    list1.pushHead(array, 0, 2);
+
+    /*list1.popHead();
+    list1.popTail();
+    list1.pushHead(52);
+    list1.pushHead(51252);
+    list1.popPos(0);
+    list1.popTail();
+    list1.popTail();*/
+    gbstl::LinkedList<int> list2 = std::move(list1);
+    for (int val : list2) {
         std::cout << val << std::endl;
     }
+    printf("LEN: %d, HEAD: %d, TAIL: %d",list2.length(),list2.head(),list2.tail());
 }
