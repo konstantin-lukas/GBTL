@@ -1,4 +1,3 @@
-C:/git_shit/GBSTL/cmake-build-debug/CMakeFiles/linked_list.dir
-C:/git_shit/GBSTL/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-C:/git_shit/GBSTL/cmake-build-debug/CMakeFiles/test.dir
-C:/git_shit/GBSTL/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/git_shit/GBTL/cmake-build-debug/CMakeFiles/GBTL.dir
+C:/git_shit/GBTL/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/git_shit/GBTL/cmake-build-debug/CMakeFiles/rebuild_cache.dir

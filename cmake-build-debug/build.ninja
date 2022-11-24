@@ -11,7 +11,7 @@
 # =============================================================================
 
 # =============================================================================
-# Project: GBSTL
+# Project: GBTL
 # Configurations: Debug
 # =============================================================================
 
@@ -39,45 +39,58 @@ include CMakeFiles/rules.ninja
 #############################################
 # Logical path to working directory; prefix for absolute paths.
 
-cmake_ninja_workdir = C$:/git_shit/GBSTL/cmake-build-debug/
+cmake_ninja_workdir = C$:/git_shit/GBTL/cmake-build-debug/
 # =============================================================================
-# Object build statements for STATIC_LIBRARY target linked_list
+# Object build statements for EXECUTABLE target GBTL
 
 
 #############################################
-# Order-only phony target for linked_list
+# Order-only phony target for GBTL
 
-build cmake_object_order_depends_target_linked_list: phony || CMakeFiles/linked_list.dir
+build cmake_object_order_depends_target_GBTL: phony || CMakeFiles/GBTL.dir
 
-build CMakeFiles/linked_list.dir/source/linked_list.cpp.obj: CXX_COMPILER__linked_list_Debug C$:/git_shit/GBSTL/source/linked_list.cpp || cmake_object_order_depends_target_linked_list
-  DEP_FILE = CMakeFiles\linked_list.dir\source\linked_list.cpp.obj.d
+build CMakeFiles/GBTL.dir/test_scripts/main.cpp.obj: CXX_COMPILER__GBTL_Debug C$:/git_shit/GBTL/test_scripts/main.cpp || cmake_object_order_depends_target_GBTL
+  DEP_FILE = CMakeFiles\GBTL.dir\test_scripts\main.cpp.obj.d
   FLAGS = -g -std=gnu++20
-  INCLUDES = -IC:/git_shit/GBSTL/include
-  OBJECT_DIR = CMakeFiles\linked_list.dir
-  OBJECT_FILE_DIR = CMakeFiles\linked_list.dir\source
+  INCLUDES = -IC:/git_shit/GBTL/include
+  OBJECT_DIR = CMakeFiles\GBTL.dir
+  OBJECT_FILE_DIR = CMakeFiles\GBTL.dir\test_scripts
 
 
 # =============================================================================
-# Link build statements for STATIC_LIBRARY target linked_list
+# Link build statements for EXECUTABLE target GBTL
 
 
 #############################################
-# Link the static library ..\lib\linked_list.a
+# Link the executable ..\test_scripts\GBTL.exe
 
-build ../lib/linked_list.a: CXX_STATIC_LIBRARY_LINKER__linked_list_Debug CMakeFiles/linked_list.dir/source/linked_list.cpp.obj
-  LANGUAGE_COMPILE_FLAGS = -g
-  OBJECT_DIR = CMakeFiles\linked_list.dir
+build ../test_scripts/GBTL.exe: CXX_EXECUTABLE_LINKER__GBTL_Debug CMakeFiles/GBTL.dir/test_scripts/main.cpp.obj
+  FLAGS = -g
+  LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  OBJECT_DIR = CMakeFiles\GBTL.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = ..\lib\linked_list.a
-  TARGET_PDB = linked_list.a.dbg
+  TARGET_FILE = ..\test_scripts\GBTL.exe
+  TARGET_IMPLIB = libGBTL.dll.a
+  TARGET_PDB = GBTL.exe.dbg
+
+
+#############################################
+# Utility command for edit_cache
+
+build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\git_shit\GBTL\cmake-build-debug && "C:\Program Files\JetBrains\CLion 2021.3.4\bin\cmake\win\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build edit_cache: phony CMakeFiles/edit_cache.util
 
 
 #############################################
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D C:\git_shit\GBSTL\cmake-build-debug && "C:\Program Files\JetBrains\CLion 2021.3.4\bin\cmake\win\bin\cmake.exe" --regenerate-during-build -SC:\git_shit\GBSTL -BC:\git_shit\GBSTL\cmake-build-debug"
+  COMMAND = cmd.exe /C "cd /D C:\git_shit\GBTL\cmake-build-debug && "C:\Program Files\JetBrains\CLion 2021.3.4\bin\cmake\win\bin\cmake.exe" --regenerate-during-build -SC:\git_shit\GBTL -BC:\git_shit\GBTL\cmake-build-debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -85,60 +98,11 @@ build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
 build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 
 # =============================================================================
-# Object build statements for EXECUTABLE target test
-
-
-#############################################
-# Order-only phony target for test
-
-build cmake_object_order_depends_target_test: phony || cmake_object_order_depends_target_linked_list
-
-build CMakeFiles/test.dir/test/test.cpp.obj: CXX_COMPILER__test_Debug C$:/git_shit/GBSTL/test/test.cpp || cmake_object_order_depends_target_test
-  DEP_FILE = CMakeFiles\test.dir\test\test.cpp.obj.d
-  FLAGS = -g -std=gnu++20
-  INCLUDES = -IC:/git_shit/GBSTL/include
-  OBJECT_DIR = CMakeFiles\test.dir
-  OBJECT_FILE_DIR = CMakeFiles\test.dir\test
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target test
-
-
-#############################################
-# Link the executable ..\bin\test.exe
-
-build ../bin/test.exe: CXX_EXECUTABLE_LINKER__test_Debug CMakeFiles/test.dir/test/test.cpp.obj | ../lib/linked_list.a || ../lib/linked_list.a
-  FLAGS = -g
-  LINK_LIBRARIES = ../lib/linked_list.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
-  OBJECT_DIR = CMakeFiles\test.dir
-  POST_BUILD = cd .
-  PRE_LINK = cd .
-  TARGET_FILE = ..\bin\test.exe
-  TARGET_IMPLIB = ..\lib\libtest.dll.a
-  TARGET_PDB = test.exe.dbg
-
-
-#############################################
-# Utility command for edit_cache
-
-build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D C:\git_shit\GBSTL\cmake-build-debug && "C:\Program Files\JetBrains\CLion 2021.3.4\bin\cmake\win\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
-  DESC = No interactive CMake dialog available...
-  restat = 1
-
-build edit_cache: phony CMakeFiles/edit_cache.util
-
-# =============================================================================
 # Target aliases.
 
-build linked_list: phony ../lib/linked_list.a
+build GBTL: phony ../test_scripts/GBTL.exe
 
-build linked_list.a: phony ../lib/linked_list.a
-
-build test: phony ../bin/test.exe
-
-build test.exe: phony ../bin/test.exe
+build GBTL.exe: phony ../test_scripts/GBTL.exe
 
 # =============================================================================
 # Folder targets.
@@ -146,9 +110,9 @@ build test.exe: phony ../bin/test.exe
 # =============================================================================
 
 #############################################
-# Folder: C:/git_shit/GBSTL/cmake-build-debug
+# Folder: C:/git_shit/GBTL/cmake-build-debug
 
-build all: phony ../lib/linked_list.a ../bin/test.exe
+build all: phony ../test_scripts/GBTL.exe
 
 # =============================================================================
 # Built-in targets

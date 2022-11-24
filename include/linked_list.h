@@ -1,252 +1,265 @@
-#ifndef GBSTL_LINKED_LIST_H
-#define GBSTL_LINKED_LIST_H
+#pragma once
 
 #include <cstddef>
 #include <iostream>
 #include <memory>
 
-namespace gbstl {
+namespace gbtl {
 
-    template<typename type> class LinkedList {
-        struct Link {
-            type value;
-            Link *nextLink;
-            explicit Link(type val) : value(val), nextLink(nullptr){}
-            explicit Link(type val, Link *next) : value(val), nextLink(next){}
+    template<typename T> class linked_list {
+        struct link {
+            T value;
+            link *nextLink;
+            explicit link(T val) : value(val), nextLink(nullptr){}
+            explicit link(T val, link *next) : value(val), nextLink(next){}
         };
     private:
-        Link *mp_Head = nullptr;
-        Link *mp_Tail = nullptr;
-        size_t m_Length = 0;
+        link *mp_Front = nullptr;
+        link *mp_Back = nullptr;
+        size_t m_Size = 0;
     public:
-        // CONSTRUCTORS
-        LinkedList() = default;
-        LinkedList(const int array[], uint32_t begin, uint32_t end) {
+
+        /**
+         * @brief The default constructor creates a list without elements in constant time.
+         */
+        linked_list() = default;
+        linked_list(const int array[], uint32_t begin, uint32_t end) {
             if (end < begin) throw std::out_of_range("end cannot be smaller than begin");
-            Link *tmpPtr = mp_Head = new Link(array[begin]);
+            link *tmpPtr = mp_Front = new link(array[begin]);
             for (uint32_t i = begin + 1; i <= end; i++) {
-                tmpPtr->nextLink = new Link(array[i]);
+                tmpPtr->nextLink = new link(array[i]);
                 tmpPtr = tmpPtr->nextLink;
             }
-            mp_Tail = tmpPtr;
-            m_Length = end - begin + 1;
+            mp_Back = tmpPtr;
+            m_Size = end - begin + 1;
         }
 
         // COPY CONSTRUCTOR
-        LinkedList(const LinkedList &src) {
-            m_Length = src.m_Length;
-            mp_Head = new Link(src.mp_Head->value, src.mp_Head->nextLink);
-            Link *tmpPtr = mp_Head;
+        linked_list(const linked_list &src) {
+            m_Size = src.m_Size;
+            mp_Front = new link(src.mp_Front->value, src.mp_Front->nextLink);
+            link *tmpPtr = mp_Front;
             while (tmpPtr->nextLink != nullptr) {
-                tmpPtr->nextLink = new Link(tmpPtr->nextLink->value, tmpPtr->nextLink->nextLink);
+                tmpPtr->nextLink = new link(tmpPtr->nextLink->value, tmpPtr->nextLink->nextLink);
                 if (tmpPtr->nextLink != nullptr) tmpPtr = tmpPtr->nextLink;
             }
-            mp_Tail = tmpPtr;
+            mp_Back = tmpPtr;
         }
 
         // MOVE CONSTRUCTOR
-        LinkedList(LinkedList &&src) noexcept {
-            mp_Head = src.mp_Head;
-            mp_Tail = src.mp_Tail;
-            m_Length = src.m_Length;
-            src.mp_Head = nullptr;
-            src.mp_Tail = nullptr;
-            src.m_Length = 0;
+        linked_list(linked_list &&src) noexcept {
+            mp_Front = src.mp_Front;
+            mp_Back = src.mp_Back;
+            m_Size = src.m_Size;
+            src.mp_Front = nullptr;
+            src.mp_Back = nullptr;
+            src.m_Size = 0;
         }
 
-        LinkedList& operator=(LinkedList &&src) noexcept {
+        linked_list& operator=(linked_list &&src) noexcept {
             if (this != &src) {
-                mp_Head = src.mp_Head;
-                mp_Tail = src.mp_Tail;
-                m_Length = src.m_Length;
-                src.mp_Head = nullptr;
-                src.mp_Head = nullptr;
-                src.m_Length = 0;
+                mp_Front = src.mp_Front;
+                mp_Back = src.mp_Back;
+                m_Size = src.m_Size;
+                src.mp_Front = nullptr;
+                src.mp_Front = nullptr;
+                src.m_Size = 0;
             }
             return *this;
         }
 
         // DESTRUCTOR
-        ~LinkedList() { flush(); }
+        ~linked_list() { clear(); }
 
-        void flush() {
-            Link* garbage = mp_Head;
+        void clear() {
+            link* garbage = mp_Front;
             while (garbage != nullptr) {
-                Link *nextLink = garbage->nextLink;
+                link *nextLink = garbage->nextLink;
                 delete garbage;
                 garbage = nextLink;
             }
-            mp_Head = nullptr;
-            mp_Tail = nullptr;
-            m_Length = 0;
+            mp_Front = nullptr;
+            mp_Back = nullptr;
+            m_Size = 0;
         }
 
-        void pushHead(const type& value) {
-            mp_Head = new Link(value, mp_Head);
-            m_Length++;
+        void push_front(const T& value) {
+            mp_Front = new link(value, mp_Front);
+            m_Size++;
         }
 
-        void pushHead(const type values[], uint32_t begin, uint32_t end) {
+        void push_front(const T values[], uint32_t begin, uint32_t end) {
             if (end < begin) throw std::out_of_range("end cannot be smaller than begin");
-            Link *tmpPtr = mp_Head = new Link(values[begin], mp_Head);
+            link *tmpPtr = mp_Front = new link(values[begin], mp_Front);
             for (uint32_t i = begin + 1; i <= end; ++i) {
-                tmpPtr = tmpPtr->nextLink = new Link(values[i], tmpPtr->nextLink);
+                tmpPtr = tmpPtr->nextLink = new link(values[i], tmpPtr->nextLink);
             }
-            if (m_Length == 0) mp_Tail = tmpPtr;
-            m_Length += end - begin + 1;
+            if (m_Size == 0) mp_Back = tmpPtr;
+            m_Size += end - begin + 1;
         }
 
-        void pushTail(const type& value) {
-            if (m_Length == 0)
-                mp_Head = mp_Tail = new Link(value);
+        void push_back(const T& value) {
+            if (m_Size == 0)
+                mp_Front = mp_Back = new link(value);
             else {
-                mp_Tail->nextLink = new Link(value);
-                mp_Tail = mp_Tail->nextLink;
+                mp_Back->nextLink = new link(value);
+                mp_Back = mp_Back->nextLink;
             }
-            m_Length++;
+            m_Size++;
         }
 
-        void pushTail(const type values[], uint32_t begin, uint32_t end) {
+        void push_back(const T values[], uint32_t begin, uint32_t end) {
             if (end < begin) throw std::out_of_range("end cannot be smaller than begin");
-            if (m_Length == 0)
-                mp_Head = mp_Tail = new Link(values[begin]);
+            if (m_Size == 0)
+                mp_Front = mp_Back = new link(values[begin]);
             else {
-                mp_Tail = mp_Tail->nextLink = new Link(values[begin]);
+                mp_Back = mp_Back->nextLink = new link(values[begin]);
             }
             for (uint32_t i = begin + 1; i <= end; ++i) {
-                mp_Tail = mp_Tail->nextLink = new Link(values[i]);
+                mp_Back = mp_Back->nextLink = new link(values[i]);
             }
-            m_Length += end - begin + 1;
+            m_Size += end - begin + 1;
         }
 
-        void pushPos(const type& value, uint32_t pos) {
-            if (pos > m_Length - 1) throw std::out_of_range("specified position is out of range");
-            if (m_Length == 0) {
-                mp_Head = mp_Tail = new Link(value);
-                m_Length = 1;
+        void insert(const T& value, uint32_t pos) {
+            if (pos > m_Size - 1) throw std::out_of_range("specified position is out of range");
+            if (m_Size == 0) {
+                mp_Front = mp_Back = new link(value);
+                m_Size = 1;
             } else {
                 if (pos == 0) {
-                    mp_Head = new Link(value, mp_Head);
-                } else if (pos == m_Length - 1) {
-                    mp_Tail->nextLink = new Link(value);
-                    mp_Tail = mp_Tail->nextLink;
+                    mp_Front = new link(value, mp_Front);
+                } else if (pos == m_Size - 1) {
+                    mp_Back->nextLink = new link(value);
+                    mp_Back = mp_Back->nextLink;
                 } else {
-                    Link *tmpPtr = mp_Head;
+                    link *tmpPtr = mp_Front;
                     for (uint32_t i = 1; i < pos; i++) tmpPtr = tmpPtr->nextLink;
-                    tmpPtr->nextLink = new Link(value, tmpPtr->nextLink);
+                    tmpPtr->nextLink = new link(value, tmpPtr->nextLink);
                 }
-                m_Length++;
+                m_Size++;
             }
         }
 
-        void pushPos(const type values[], uint32_t pos, uint32_t begin, uint32_t end) {
-            if (pos > m_Length - 1) throw std::out_of_range("specified position is out of range");
+        void insert(const T values[], uint32_t pos, uint32_t begin, uint32_t end) {
+            if (pos > m_Size - 1) throw std::out_of_range("specified position is out of range");
             if (end < begin) throw std::out_of_range("end cannot be smaller than begin");
-            Link *tmpPtr;
-            if (m_Length == 0) {
-                tmpPtr = mp_Head = new Link(values[begin]);
-                mp_Tail = tmpPtr;
+            link *tmpPtr;
+            if (m_Size == 0) {
+                tmpPtr = mp_Front = new link(values[begin]);
+                mp_Back = tmpPtr;
             } else {
                 if (pos == 0) {
-                    tmpPtr = mp_Head = new Link(values[begin], mp_Head);
+                    tmpPtr = mp_Front = new link(values[begin], mp_Front);
                 } else {
-                    tmpPtr = mp_Head;
+                    tmpPtr = mp_Front;
                     for (uint32_t i = 1; i < pos; ++i) tmpPtr = tmpPtr->nextLink;
-                    tmpPtr = tmpPtr->nextLink = new Link(values[begin], tmpPtr->nextLink);
+                    tmpPtr = tmpPtr->nextLink = new link(values[begin], tmpPtr->nextLink);
                 }
             }
             for (uint32_t i = begin + 1; i <= end; ++i) {
-                tmpPtr = tmpPtr->nextLink = new Link(values[i], tmpPtr->nextLink);
+                tmpPtr = tmpPtr->nextLink = new link(values[i], tmpPtr->nextLink);
             }
-            if (pos == m_Length - 1) mp_Tail = tmpPtr;
-            m_Length += end - begin + 1;
+            if (pos == m_Size - 1) mp_Back = tmpPtr;
+            m_Size += end - begin + 1;
         }
 
-        void popHead() {
-            if (m_Length == 0) return;
-            if (m_Length == 1) {
-                delete mp_Head;
-                mp_Head = mp_Tail = nullptr;
-                m_Length = 0;
+        void pop_front() {
+            if (m_Size == 0) return;
+            if (m_Size == 1) {
+                delete mp_Front;
+                mp_Front = mp_Back = nullptr;
+                m_Size = 0;
             } else {
-                Link *tmpPtr = mp_Head->nextLink;
-                delete mp_Head;
-                m_Length--;
-                mp_Head = tmpPtr;
+                link *tmpPtr = mp_Front->nextLink;
+                delete mp_Front;
+                m_Size--;
+                mp_Front = tmpPtr;
             }
         }
 
-        void popTail() {
-            if (m_Length == 0) return;
-            if (m_Length == 1) {
-                delete mp_Head;
-                mp_Head = mp_Tail = nullptr;
-                m_Length = 0;
+        void pop_back() {
+            if (m_Size == 0) return;
+            if (m_Size == 1) {
+                delete mp_Front;
+                mp_Front = mp_Back = nullptr;
+                m_Size = 0;
             } else {
-                Link *tmpPtr = mp_Head;
-                while (tmpPtr->nextLink != mp_Tail) tmpPtr = tmpPtr->nextLink;
-                delete mp_Tail;
-                mp_Tail = tmpPtr;
-                m_Length--;
+                link *tmpPtr = mp_Front;
+                while (tmpPtr->nextLink != mp_Back) tmpPtr = tmpPtr->nextLink;
+                delete mp_Back;
+                mp_Back = tmpPtr;
+                m_Size--;
             }
         }
 
-        /*void popPos(const uint32_t pos) {
-            if (pos > m_Length) throw std::out_of_range("specified position is out of range");
-            if (m_Length == 0) return;
-            Link *tmpPtr = mp_Head;
-
-
-        }*/
-
-        // TODO POP_POS (OVERLOAD ARRAY)
+        // TODO: POP_POS (OVERLOAD ARRAY)
         // TODO: CONCAT
         // TODO: SORT
         // TODO: MERGE
+        // TODO: EMPLACE
         // TODO: DOCUMENTATION
 
-        [[nodiscard]] size_t length() const { return m_Length; }
+        [[nodiscard]] size_t size() const { return m_Size; }
 
-        [[nodiscard]] bool isEmpty() const { return mp_Head == nullptr; }
+        [[nodiscard]] bool empty() const { return mp_Front == nullptr; }
 
-        [[nodiscard]] const type& head() const { return mp_Head->value; }
+        [[nodiscard]] const T& front() const {
+            if (mp_Front == nullptr) return NULL;
+            return mp_Front->value;
+        }
 
-        [[nodiscard]] const type& tail() const { return mp_Tail->value; }
+        [[nodiscard]] const T& back() const {
+            if (mp_Back == nullptr) return NULL;
+            return mp_Back->value;
+        }
 
-        class Iterator {
+        class iterator {
             // TODO: REVERSE ITERATOR
         public:
-            explicit Iterator(Link *ptr) : mp_Ptr(ptr) {}
-            Iterator& operator++() {
+            explicit iterator(link *ptr) : mp_Ptr(ptr) {}
+            iterator& operator++() {
                 mp_Ptr = mp_Ptr->nextLink;
                 return *this;
             }
-            const Iterator operator++(int) {
-                Iterator it = *this;
+            const iterator operator++(int) {
+                iterator it = *this;
                 ++(*this);
                 return it;
             }
-            type operator*() {
+            T operator*() {
                 return this->mp_Ptr->value;
             }
-            bool operator!=(const Iterator& it) const {
+            bool operator!=(const iterator& it) const {
                 return mp_Ptr != it.mp_Ptr;
             }
-            bool operator==(const Iterator& it) const {
+            bool operator==(const iterator& it) const {
                 return mp_Ptr == it.mp_Ptr;
             }
         private:
-            Link *mp_Ptr;
+            link *mp_Ptr;
         };
 
-        Iterator begin() {
-            return Iterator(mp_Head);
+        iterator begin() {
+            return iterator(mp_Front);
         }
 
-        Iterator end() {
-            return Iterator(nullptr);
+        iterator end() {
+            return iterator(nullptr);
+        }
+
+        friend std::ostream& operator<< (std::ostream& stream, const linked_list& list) {
+            link* link = list.mp_Front;
+            stream << "[";
+            while (link != nullptr) {
+                stream << link->value;
+                link = link->nextLink;
+                if (link != nullptr)
+                    stream << ", ";
+            }
+            stream << "]";
+            return stream;
         }
     };
 
 }
-#endif //GBSTL_LINKED_LIST_H
