@@ -10,8 +10,8 @@ namespace gbtl {
         struct link {
             T value;
             link *nextLink;
-            explicit link(T val) : value(val), nextLink(nullptr){}
-            explicit link(T val, link *next) : value(val), nextLink(next){}
+            explicit link(const T &val) : value(val), nextLink(nullptr){}
+            explicit link(const T &val, link *next) : value(val), nextLink(next){}
         };
     private:
         link *mp_Front = nullptr;
@@ -23,15 +23,22 @@ namespace gbtl {
          * @brief The default constructor creates a list without elements in constant time.
          */
         linked_list() = default;
-        linked_list(const int array[], uint32_t begin, uint32_t end) {
-            if (end < begin) throw std::out_of_range("end cannot be smaller than begin");
-            link *tmpPtr = mp_Front = new link(array[begin]);
-            for (uint32_t i = begin + 1; i <= end; i++) {
-                tmpPtr->nextLink = new link(array[i]);
-                tmpPtr = tmpPtr->nextLink;
+
+        linked_list(std::initializer_list<T> init) {
+            auto iterator = init.begin();
+            if (iterator != init.end()) {
+                if (m_Size == 0) {
+                    mp_Front = mp_Back = new link(*iterator);
+                } else {
+                    mp_Back = mp_Back->nextLink = new link(*iterator);
+                }
+                m_Size++;
+                iterator++;
+                for (;iterator != init.end(); iterator++) {
+                    mp_Back = mp_Back->nextLink = new link(*iterator);
+                    m_Size++;
+                }
             }
-            mp_Back = tmpPtr;
-            m_Size = end - begin + 1;
         }
 
         // COPY CONSTRUCTOR
@@ -44,6 +51,20 @@ namespace gbtl {
                 if (tmpPtr->nextLink != nullptr) tmpPtr = tmpPtr->nextLink;
             }
             mp_Back = tmpPtr;
+        }
+
+        linked_list& operator=(const linked_list &src) {
+            if (this != &src) {
+                m_Size = src.m_Size;
+                mp_Front = new link(src.mp_Front->value, src.mp_Front->nextLink);
+                link *tmpPtr = mp_Front;
+                while (tmpPtr->nextLink != nullptr) {
+                    tmpPtr->nextLink = new link(tmpPtr->nextLink->value, tmpPtr->nextLink->nextLink);
+                    if (tmpPtr->nextLink != nullptr) tmpPtr = tmpPtr->nextLink;
+                }
+                mp_Back = tmpPtr;
+            }
+            return *this;
         }
 
         // MOVE CONSTRUCTOR
@@ -83,7 +104,7 @@ namespace gbtl {
             m_Size = 0;
         }
 
-        void push_front(const T& value) {
+        void push_front(const T &value) {
             mp_Front = new link(value, mp_Front);
             m_Size++;
         }
@@ -98,7 +119,7 @@ namespace gbtl {
             m_Size += end - begin + 1;
         }
 
-        void push_back(const T& value) {
+        void push_back(const T &value) {
             if (m_Size == 0)
                 mp_Front = mp_Back = new link(value);
             else {
